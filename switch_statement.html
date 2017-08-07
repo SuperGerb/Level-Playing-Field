@@ -1,0 +1,123 @@
+This worked: function lookupTeamSalary(teamName){
+			
+				$.each(salaries, function(index,value){
+				
+					if(salaries[index].team === teamName){
+						
+						console.log(teamName + "'s salary is: " + salaries[index].salary);
+						
+						return salaries[index].salary;
+					}
+		
+				});
+			};
+	
+			lookupTeamSalary('cordova');
+			
+Why didn't the regular for loops below? (Placed right after the salaries array.)
+			
+			
+				
+	
+	function lookup(array, prop, value) {
+	    for (var i = 0, len = array.length; i < len; i++){
+	        if (array[i][prop] === value){
+		        return array[i]; 
+		        console.log('Array i is ' + array[i]);
+	        } 
+	    }
+	}
+	
+	lookup(salaries, "team", "almeria");
+	
+
+	var teamName = "almeria";
+	
+	var findSalary = function(teamName) {
+	
+	    for (var i = 0, len = salaries.length; i < len; i++) {
+	    
+	        if (salaries[i].team === teamName)
+
+	            return salaries[i]; // Return as soon as the object is found  
+	            
+	            console.log("The salaries are " + salaries[i]);
+	             
+	            console.log('Returned object = ' + salaries[i]);
+
+			}
+	    
+			return null; // The object was not found
+		
+	};
+	
+	findSalary(teamName);
+	
+	console.log('Almeria salary= ' + findSalary.salary);
+	
+	
+	
+
+switch(value.) {
+				case "almeria":
+					salary = 11.7;
+					break;	
+				case "athletic":
+					salary = 49.9;
+					break; 
+				case "atletico":
+					salary = 105;
+					break; 
+				case"celta":
+					salary = 18.7;
+					break; 
+				case "cordoba":
+					salary = 14.2;
+					break; 
+				case "deportivo":
+					salary = 15.3;
+					break; 
+				case "eibar":
+					salary = 12.8;
+					break; 
+				case "elche":
+					salary = 12.5;
+					break; 
+				case "espanol":
+					salary = 32.2;
+					break; 
+				case "barcelona":
+					salary = 347.9;
+					break; 
+				case "getafe":
+					salary = 18.7;
+					break; 
+				case "granada":
+					salary = 22.8;
+					break; 
+				case "levante":
+					salary = 17;
+					break; 
+				case "malaga":
+					salary = 27.5;
+					break; 
+				case "rayo":
+					salary = 15.8;
+					break; 
+				case "madrid":
+					salary = 328;
+					break; 
+				case "realsociedad":
+					salary = 38.9;
+					break; 
+				case "sevilla":
+					salary = 78.6;
+					break; 
+				case "valencia":
+					salary = 73;
+					break; 
+				case "villareal":
+					salary = 44.2;
+				default:
+					salary = "N/A";
+			}
