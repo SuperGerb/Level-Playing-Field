@@ -1,6 +1,7 @@
 $(document).ready(function(){
 	var season = {id: 436, year: 2016}; //436 = 2016-2017 season
 	var responseObj;
+	var currentMatchNumber = 0;
 
 	var salaries = {
 		/* Salary info from: https://www.transfermarkt.com/laliga/startseite/wettbewerb/ES1/plus/?saison_id=2017, in pounds.
@@ -56,25 +57,6 @@ $(document).ready(function(){
 		]
 	};
 
-	if(window.Worker){
-		var calculateLeagueTableWorker = new Worker("js/worker.js");
-		//Continue here, making a worker file to do the calculations for the league table
-		//https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
-
-		//Message sent to worker with postMessage() method:
-		function test(){
-			calculateLeagueTableWorker.postMessage(["hi","howdy"]);
-			console.log('Message posted to worker');
-		}
-
-		//And received by the onmessage event handler:
-		//The message is available in the message event's data attribute.
-		calculateLeagueTableWorker.onmessage = function(e){
-			console.log("Message " + e.data + " received from worker");
-		}
-		
-	}
-
 	function lookupTeamSalary(team, year){
 		var salary = 0;
 		$.each(salaries, function(index,value){
@@ -91,9 +73,35 @@ $(document).ready(function(){
 	};
 
 	function init(){
-		getParticularMatch(38);
+		/* Question about asynchronous programming :
+		getParticularMatch(currentMatchNumber) has to happen once getCurrentMatchNumber() is completed.
+		Either return currentMatchNumer in getCurrentMatchNumer and write
+		getParticularMatch(getCurrentMatchNumber());
+		Or call getParticularMatch() inside getCurrentMatchNumber(), though really I just want to call getCurrentMatchNumber once on init, and save the result to a global variable that I can use various times...
+		*/
+		//getParticularMatch(getCurrentMatchNumber()); //This way doesn't work. Because Ajax already has its own callback?
+		//getParticularMatch(currentMatchNumber);
+		getCurrentMatchNumber();
 		getCurrentLeagueTable();
 		test();
+	}
+
+	//Get current match number (ie. what was the last match played):
+	function getCurrentMatchNumber(){
+		var seasonId = season.id;
+		var seasonYr = season.year;
+		var seasonYrSpan = seasonYr + "-" + seasonYr + 1;
+		$.ajax({
+		  	headers: { 'X-Auth-Token': '7ff8904b117547748572064ac1e28265' },
+		 	url: 'http://api.football-data.org/v1/competitions/' + seasonId + '/leagueTable',
+		   	dataType: 'json',
+		   	type: 'GET',
+		 }).done(function(response) {
+		 	currentMatchNumber = response.matchday;
+		 	console.log("Current match number = " + currentMatchNumber);
+		 	//And display current match results:
+		 	getParticularMatch(currentMatchNumber); //I couldn't call this elsewhere... see question on asynchronous programming
+		 }); 
 	}
 
 	//To get league table/current standing:
@@ -149,6 +157,25 @@ $(document).ready(function(){
 
 	// 	fillMatchSelectField(lastMatchPlayed);
 	// }
+
+	if(window.Worker){
+		var calculateLeagueTableWorker = new Worker("js/worker.js");
+		//Continue here, making a worker file to do the calculations for the league table
+		//https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
+
+		//Message sent to worker with postMessage() method:
+		function test(){
+			calculateLeagueTableWorker.postMessage(["hi","howdy"]);
+			console.log('Message posted to worker');
+		}
+
+		//And received by the onmessage event handler:
+		//The message is available in the message event's data attribute.
+		calculateLeagueTableWorker.onmessage = function(e){
+			console.log("Message " + e.data + " received from worker");
+		}
+		
+	}
 
 	function fillMatchSelectField(lastMatchPlayed){
 		var matchSelectBox = 'Get standings for match: <select id="matchSelection">';

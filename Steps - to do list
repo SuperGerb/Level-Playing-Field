@@ -10,3 +10,5 @@
 //https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
 
 Web Workers is a simple means for web content to run scripts in background threads. The worker thread can perform tasks without interfering with the user interface. Once created, a worker can send messages to the JavaScript code that created it by posting messages to an event handler specified by that code.
+
+You don’t (synchronously) wait for the results of a long-running computation (your own algorithm in a Worker process, a network request, etc.), you carry on with the event loop and let the computation notify you when it is finished.
