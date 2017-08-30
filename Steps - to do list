@@ -1,0 +1,12 @@
+1. Get current league table 
+  - get matchday (= number of last match played)
+  - display results of last match played by calling getParticularMatch(matchday)
+
+2. Calculate and add results of all matches <= matchday 
+  - display league table
+  - display league table of modified results
+
+  //Continue with worker to do the calculations for the league table
+//https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
+
+Web Workers is a simple means for web content to run scripts in background threads. The worker thread can perform tasks without interfering with the user interface. Once created, a worker can send messages to the JavaScript code that created it by posting messages to an event handler specified by that code.

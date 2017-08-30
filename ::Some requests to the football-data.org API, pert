@@ -1,0 +1,39 @@
+//Some requests to the football-data.org API, pertaining to La Liga:
+
+http://api.football-data.org/v1/competitions/?season=2015 :
+"id": 399,
+"caption": "Primera Division 2015/16",
+"league": "PD",
+"year": "2015",
+"numberOfTeams": 20,
+"numberOfGames": 380,
+"lastUpdated": "2015-10-27T08:14:21Z"
+
+http://api.football-data.org/v1/competitions/?season=2016 :
+id: 436,
+caption: "Primera Division 2016/17",
+league: "PD",
+year: "2016",
+currentMatchday: 38,
+numberOfMatchdays: 38,
+numberOfTeams: 20,
+numberOfGames: 380,
+lastUpdated: "2017-05-21T20:00:24Z"
+
+http://api.football-data.org/v1/competitions/?season=2017 :
+id: 455,
+caption: "Primera Division 2017",
+league: "PD",
+year: "2017",
+currentMatchday: 1,
+numberOfMatchdays: 38,
+numberOfTeams: 20,
+numberOfGames: 380,
+lastUpdated: "2017-07-21T13:50:26Z"
+
+
+http://api.football-data.org/v1/competitions/436/fixtures:
+//Lists all 380 matches in the 2016-2017 season
+
+//Just the games from one match (the last of the season, for example):
+http://api.football-data.org/v1/competitions/436/fixtures?matchday=38
