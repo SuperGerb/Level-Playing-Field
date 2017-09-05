@@ -1,6 +1,7 @@
 $(document).ready(function(){
 	var season = {id: 436, year: 2016}; //436 = 2016-2017 season
 	var responseObj;
+	var currentMatchNumberSet = false;
 	var currentMatchNumber = 0;
 
 	var salaries = {
@@ -74,16 +75,15 @@ $(document).ready(function(){
 
 	function init(){
 		/* Question about asynchronous programming :
-		getParticularMatch(currentMatchNumber) has to happen once getCurrentMatchNumber() is completed.
+		How to get getParticularMatch(currentMatchNumber) has to happen once getCurrentMatchNumber() is completed? 
 		Either return currentMatchNumer in getCurrentMatchNumer and write
 		getParticularMatch(getCurrentMatchNumber());
-		Or call getParticularMatch() inside getCurrentMatchNumber(), though really I just want to call getCurrentMatchNumber once on init, and save the result to a global variable that I can use various times...
+		Or call getParticularMatch() inside getCurrentMatchNumber(), which is what I ended up doing. I just want to call getCurrentMatchNumber once on init, and save the result to a global variable that I can use various times... Does it confuse things to be calling getParticularMatch inside of getCurrentMatchNumber (as a callback function)? I think it's correct.
 		*/
 		//getParticularMatch(getCurrentMatchNumber()); //This way doesn't work. Because Ajax already has its own callback?
 		//getParticularMatch(currentMatchNumber);
-		getCurrentMatchNumber();
+		getCurrentMatchNumber(); //#1 in the call stack
 		getCurrentLeagueTable();
-		test();
 	}
 
 	//Get current match number (ie. what was the last match played):
@@ -97,8 +97,12 @@ $(document).ready(function(){
 		   	dataType: 'json',
 		   	type: 'GET',
 		 }).done(function(response) {
+		 	//Set the global variable to the current match day:
 		 	currentMatchNumber = response.matchday;
 		 	console.log("Current match number = " + currentMatchNumber);
+		 	//Send the current match day to the web worker so it can calculate the adjusted league table: (Might as well call it as soon as possible because it's going to be working in the background and will just notify me when it's finished):
+		 	calculateAdjustedLeagueTable();
+		 	//#2 in the call stack:
 		 	//And display current match results:
 		 	getParticularMatch(currentMatchNumber); //I couldn't call this elsewhere... see question on asynchronous programming
 		 }); 
@@ -133,48 +137,22 @@ $(document).ready(function(){
 		 }); 
 	}
 
-	//To get number of matches played:
-	// function getNumberOfMatchesPlayed(){
-	// 	season = season.year;
-	// 	$.ajax({
-	// 	  	headers: { 'X-Auth-Token': '7ff8904b117547748572064ac1e28265' },
-	// 	 	url: 'http://api.football-data.org/v1/competitions/?season=' + season,
-	// 	   	dataType: 'json',
-	// 	   	type: 'GET',
-	// 	 }).done(function(response) {
-	// 	   	displayNumberOfMatchesPlayed(response);
-	// 	 }); 
-	// }
+	function calculateAdjustedLeagueTable(){
+		if(window.Worker){
+			//Create a web worker to do the calculations for the league table in order to run the script in a background thread. The worker thread can perform tasks without interfering with the user interface:
+			//Reference : https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
+			var calculateLeagueTableWorker = new Worker("js/worker.js");
 
-	// getNumberOfMatchesPlayed();
-
-	// function displayNumberOfMatchesPlayed(json){
-	// 	var lastMatchPlayed;
-
-	// 	$.each(json, function(index, value){
-	// 		console.log(value);
-	// 	});
-
-	// 	fillMatchSelectField(lastMatchPlayed);
-	// }
-
-	if(window.Worker){
-		var calculateLeagueTableWorker = new Worker("js/worker.js");
-		//Continue here, making a worker file to do the calculations for the league table
-		//https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
-
-		//Message sent to worker with postMessage() method:
-		function test(){
-			calculateLeagueTableWorker.postMessage(["hi","howdy"]);
+			//Message sent to worker with postMessage() method:
+			calculateLeagueTableWorker.postMessage([currentMatchNumber, season, salaries]);
 			console.log('Message posted to worker');
-		}
 
-		//And received by the onmessage event handler:
-		//The message is available in the message event's data attribute.
-		calculateLeagueTableWorker.onmessage = function(e){
-			console.log("Message " + e.data + " received from worker");
+			//And received by the onmessage event handler:
+			//The message is available in the message event's data attribute.
+			calculateLeagueTableWorker.onmessage = function(e){
+				console.log("Message " + e.data + " received from worker");
+			}
 		}
-		
 	}
 
 	function fillMatchSelectField(lastMatchPlayed){
@@ -240,6 +218,7 @@ $(document).ready(function(){
 	
 	function displayCurrentLeagueTable(json, year){
 		var year = year;
+		var season = year + "-" + (year+1);
 		var lastMatchPlayed = json.matchday;
 		var stats = '<table class="results-list table table-striped table-bordered table-sm">';
 		stats += '<thead>';
@@ -277,7 +256,7 @@ $(document).ready(function(){
 			stats += '<td>' + goalsAgainst + '</td>';
 			stats += '<td>' + goalDifference + '</td>';
 			stats += '<td>' + points + '</td>';
-			//What adjustment scheme do we use for the league table?
+			//Use the web worker to calculate and display the adjusted league table instead of doing it here:
 			//stats += '<td class="adjusted-score">' + adjusted_scores.score1 + '</td>';
 			//stats += '<td class="adjusted-score">' + adjusted_scores.score2 + '</td>';
 			//stats += '<td class="adjusted-score">' + adjusted_scores.score2 + '</td>';
@@ -287,17 +266,16 @@ $(document).ready(function(){
 
 		stats += '</tbody';
 		stats += '</table>';
-		$('.year').html(year);
+		$('.year-league').html(season);
 		$('#results').html(stats);
-		$('#adjusted-results').html(stats);
+		//$('#adjusted-results').html(stats);
 		fillMatchSelectField(lastMatchPlayed);
 	}
 
-	//Needs modification to get the date to use in lookUpTeamSalary:
-	function displayMatchResults (json, matchday){
+	function displayMatchResults(json, matchday){
 		console.log("Called for match " + matchday);
 		var y = new Date(json.fixtures[0].date);
-		var season = y.getFullYear() + "-" + (y.getFullYear()+1);
+		var season = y.getFullYear();
 		var year = y.getFullYear();
 	    var stats = '<table class="results-list table table-striped table-bordered table-sm">';
 	    stats += '<thead>';

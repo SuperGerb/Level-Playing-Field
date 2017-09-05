@@ -16,11 +16,11 @@ include("inc/header.php"); ?>
 	<div id="selects-zone"></div>
 
 	<div class="results-wrap">
-		<h2><span class="year"></span> La Liga Season Results</h2>
+		<h2><span class="year-league"></span> La Liga Season Results</h2>
 		<div id="results"></div>
 	</div>
 	<div class="results-wrap">
-		<h2><span class="year"></span> La Liga Adjusted Results</h2>
+		<h2><span class="year-league"></span> La Liga Adjusted Results</h2>
 		<div id="adjusted-results"></div>
 	</div>
 

@@ -95,6 +95,10 @@ thead{
 	text-align: center;
 }
 
+#selects-zone{
+	margin-bottom: 1.5rem;	
+}
+
 @media (min-width: 450px){
 	body{
 		padding: 30px;
