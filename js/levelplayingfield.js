@@ -74,6 +74,9 @@ $(document).ready(function(){
 	};
 
 	function init(){
+		//getParticularMatch(currentMatchNumber);
+		getCurrentMatchNumber(); //#1 in the call stack
+		getCurrentLeagueTable();
 		/* Question about asynchronous programming :
 		How to get getParticularMatch(currentMatchNumber) has to happen once getCurrentMatchNumber() is completed? 
 		Either return currentMatchNumer in getCurrentMatchNumer and write
@@ -81,9 +84,6 @@ $(document).ready(function(){
 		Or call getParticularMatch() inside getCurrentMatchNumber(), which is what I ended up doing. I just want to call getCurrentMatchNumber once on init, and save the result to a global variable that I can use various times... Does it confuse things to be calling getParticularMatch inside of getCurrentMatchNumber (as a callback function)? I think it's correct.
 		*/
 		//getParticularMatch(getCurrentMatchNumber()); //This way doesn't work. Because Ajax already has its own callback?
-		//getParticularMatch(currentMatchNumber);
-		getCurrentMatchNumber(); //#1 in the call stack
-		getCurrentLeagueTable();
 	}
 
 	//Get current match number (ie. what was the last match played):
@@ -120,7 +120,7 @@ $(document).ready(function(){
 		   	type: 'GET',
 		 }).done(function(response) {
 		 	responseObj = response;
-		   	displayCurrentLeagueTable(responseObj, seasonYr);
+			 displayCurrentLeagueTable(responseObj, seasonYr);
 		 }); 
 	}
 
@@ -151,28 +151,31 @@ $(document).ready(function(){
 			//The message is available in the message event's data attribute.
 			calculateLeagueTableWorker.onmessage = function(e){
 				console.log("Message " + e.data + " received from worker");
+				var salaryArrayWithAdjustedStatsAdded = e.data;
+				console.dir(salaryArrayWithAdjustedStatsAdded);
+				displayAdustedLeagueTable(salaryArrayWithAdjustedStatsAdded);
 			}
 		}
 	}
 
-	function fillMatchSelectField(lastMatchPlayed){
-		var matchSelectBox = 'Get standings for match: <select id="matchSelection">';
-		for(var i = 1; i <= lastMatchPlayed; i++){
-			matchSelectBox += '<option>' + i + '</option>';
-		}
-		matchSelectBox += '</select>';
-		$("#selects-zone").html(matchSelectBox);
-	}
+	// function fillMatchSelectField(lastMatchPlayed){
+	// 	var matchSelectBox = 'Get standings for match: <select id="matchSelection">';
+	// 	for(var i = 1; i <= lastMatchPlayed; i++){
+	// 		matchSelectBox += '<option>' + i + '</option>';
+	// 	}
+	// 	matchSelectBox += '</select>';
+	// 	$("#selects-zone").html(matchSelectBox);
+	// }
 
 	//This has to be before the on change event, otherwise the latter doesn't fire. Why?
 	//fillMatchSelectField(38); 
 	
-	$("#matchSelection").on("change", function(){
-		console.log("Changed");
-		var matchday = $("#matchSelection option:selected").val();
-		console.log(matchday);
-		getParticularMatch(matchday);
-	});
+	// $("#matchSelection").on("change", function(){
+	// 	console.log("Changed");
+	// 	var matchday = $("#matchSelection option:selected").val();
+	// 	console.log(matchday);
+	// 	getParticularMatch(matchday);
+	// });
 
 	//To get the list of 1 division teams:
 	function getListOfTeams(){
@@ -191,7 +194,7 @@ $(document).ready(function(){
 	function getSalaryRatio(team1_salary, team2_salary){
 		var salary_ratio = team1_salary/team2_salary;
 		return salary_ratio;
-	};
+	}
 
 	var adjustmentSchemes = {
 		//Paul's adjustment scheme:
@@ -214,7 +217,7 @@ $(document).ready(function(){
 			}
 			return adjusted_scores;
 		}
-	};
+	}
 	
 	function displayCurrentLeagueTable(json, year){
 		var year = year;
@@ -256,11 +259,6 @@ $(document).ready(function(){
 			stats += '<td>' + goalsAgainst + '</td>';
 			stats += '<td>' + goalDifference + '</td>';
 			stats += '<td>' + points + '</td>';
-			//Use the web worker to calculate and display the adjusted league table instead of doing it here:
-			//stats += '<td class="adjusted-score">' + adjusted_scores.score1 + '</td>';
-			//stats += '<td class="adjusted-score">' + adjusted_scores.score2 + '</td>';
-			//stats += '<td class="adjusted-score">' + adjusted_scores.score2 + '</td>';
-			//stats += '<td class="adjusted-score">' + adjusted_scores.score2 + '</td>';
 			stats += '</tr>';
 		});
 
@@ -268,8 +266,72 @@ $(document).ready(function(){
 		stats += '</table>';
 		$('.year-league').html(season);
 		$('#results').html(stats);
-		//$('#adjusted-results').html(stats);
-		fillMatchSelectField(lastMatchPlayed);
+		//fillMatchSelectField(lastMatchPlayed);
+	}
+
+	function displayAdustedLeagueTable(adjustedStats){
+		var year = year;
+		var season = year + "-" + (year+1);
+		//var lastMatchPlayed = json.matchday;
+		var stats = '<table class="results-list table table-striped table-bordered table-sm">';
+
+		//For testing:
+		stats += '<tbody>';
+		stats += '<tr>';
+		stats += '<td>';
+		stats += 'Adjusted league table will display here!';
+		stats += '</td>';
+		stats += '</tr>';
+		stats += '</tbody>';
+
+
+		// stats += '<thead>';
+		// stats += '<tr>';
+		// stats += '<th>Team</th>';
+		// stats += '<th>MP</th>'; //Matches played
+		// stats += '<th>W</th>'; //Wins
+		// stats += '<th>D</th>'; //Draws
+		// stats += '<th>L</th>'; //Losses
+		// stats += '<th>GF</th>'; //Goals for
+		// stats += '<th>GA</th>'; //Goals against
+		// stats += '<th>GD</th>'; //Goal difference
+		// stats += '<th>PTS</th>'; //Points
+		// stats += '</tr>';
+		// stats += '</thead>';
+		// stats += '</tbody>';
+
+		// //The teams in salaryArrayWithAdjustedStatsAdded need to be ordered by descreasing pts. 
+		// $.each(json.standing, function(index,value){
+		// 	var team = value.teamName;
+		// 	var matchesPlayed = value.playedGames;
+		// 	var wins = value.wins;
+		// 	var draws = value.draws;
+		// 	var losses = value.losses;
+		// 	var goalsFor = value.goals;
+		// 	var goalsAgainst = value.goalsAgainst;
+		// 	var goalDifference = value.goalDifference;
+		// 	var points = value.points;
+		// 	stats += '<tr>';
+		// 	stats += '<td>' + team + '</td>';
+		// 	stats += '<td>' + matchesPlayed + '</td>';
+		// 	stats += '<td>' + wins + '</td>';
+		// 	stats += '<td>' + draws + '</td>';
+		// 	stats += '<td>' + losses + '</td>';
+		// 	stats += '<td>' + goalsFor + '</td>';
+		// 	stats += '<td>' + goalsAgainst + '</td>';
+		// 	stats += '<td>' + goalDifference + '</td>';
+		// 	stats += '<td>' + points + '</td>';
+		// 	//Use the web worker to calculate and display the adjusted league table instead of doing it here:
+		// 	stats += '<td class="adjusted-score">' + adjusted_scores.score1 + '</td>';
+		// 	stats += '<td class="adjusted-score">' + adjusted_scores.score2 + '</td>';
+		// 	stats += '<td class="adjusted-score">' + adjusted_scores.score2 + '</td>';
+		// 	stats += '<td class="adjusted-score">' + adjusted_scores.score2 + '</td>';
+		// 	stats += '</tr>';
+		// });
+
+		stats += '</tbody';
+		stats += '</table>';
+		$('#adjusted-results').html(stats);
 	}
 
 	function displayMatchResults(json, matchday){
@@ -291,7 +353,7 @@ $(document).ready(function(){
 	    stats += '</thead>';
 	    stats += '<tbody>';
 
-	    //.each : Iterate over a jQuery object, executing a function for each matched element.
+	    //.each : Iterate over a jQuery object, executing a function for each matched element. (The equivalent of for(index in associativeArray) in JavaScript)
 	    $.each(json.fixtures, function(index,value){		
 	    	var team1 = value.homeTeamName;
 	    	var team2 = value.awayTeamName;
@@ -334,7 +396,7 @@ $(document).ready(function(){
 	    $('.match').html(matchday);
 	    $('#results-match').html(stats);
 	    $('#adjusted-match-results').html(stats);
-	};
+	}
 	
 	init();
 			

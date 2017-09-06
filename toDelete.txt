@@ -1,0 +1,10 @@
+Malaga found. Its stats: 
+worker.js:165 salary= 80.6
+worker.js:166 w= 15
+worker.js:167 d= 8
+worker.js:168 l= 15
+worker.js:169 gf= 57
+worker.js:170 ga= 55
+worker.js:171 gd= 0
+worker.js:172 pts= 53
+

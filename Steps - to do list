@@ -3,10 +3,9 @@ Get current league table
   - get matchday (= number of last match played)
   - display results of last match played by calling getParticularMatch(matchday)
 
-2. 
+2. UMMM… Even though I’m just calling getParticularMatch for Match 1 in the worker, it is calculating for all the matches! (Which is what I ultimately want, but how is it doing this?) CHECK THIS
 Calculate and add results of all matches <= matchday 
-  - display league table
-  - display league table of modified results
+
 
   //Continue with worker to do the calculations for the league table
 //https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
@@ -14,3 +13,15 @@ Calculate and add results of all matches <= matchday
 Web Workers is a simple means for web content to run scripts in background threads. The worker thread can perform tasks without interfering with the user interface. Once created, a worker can send messages to the JavaScript code that created it by posting messages to an event handler specified by that code.
 
 You don’t (synchronously) wait for the results of a long-running computation (your own algorithm in a Worker process, a network request, etc.), you carry on with the event loop and let the computation notify you when it is finished.
+
+3. 
+Display league table of modified results
+
+3.1
+Learn unit testing to check if it’s actually doing the calculations properly
+
+4.
+Display “Loading adjusted league table” with spinner icon until ready to display.
+
+5.
+Update to current season (2017-2018 if it’s already begun)
