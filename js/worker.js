@@ -75,7 +75,7 @@ var adjustmentSchemes = {
 //To get a particular match (in Javascript, because jQuery not accepted in web workers, since the DOM can't be directly manipulated from inside a worker): 
 function getParticularMatch(matchday, seasonId){
 	 var req = new XMLHttpRequest();  
-	 req.open('GET', 'http://api.football-data.org/v1/competitions/' + seasonId + '/fixtures?mastchday=' + matchday, true);  
+	 req.open('GET', 'http://api.football-data.org/v1/competitions/' + seasonId + '/fixtures?matchday=' + matchday);  
 	 req.setRequestHeader('X-Auth-Token', '7ff8904b117547748572064ac1e28265');
 	 req.send();
 	 
@@ -89,12 +89,13 @@ function getParticularMatch(matchday, seasonId){
 }
 
 function calculateMatchResults(json, matchday){
-	console.log("Called in worker for match " + matchday);
+	console.log("Called in worker for matcheroo " + matchday);
 	var y = new Date(json.fixtures[0].date);
 	var year = y.getFullYear();
 	var fixtures = json.fixtures;
 
 	for(var index in fixtures) { 
+		console.log("Round " + index);
 		var value = fixtures[index];	
     	var team1 = value.homeTeamName;
     	var team2 = value.awayTeamName;
@@ -116,12 +117,10 @@ function calculateMatchResults(json, matchday){
 		var team1_win = 0;
 		var team1_draw = 0;
 		var team1_loss = 0;
-		var team1_goal_diff = 0;
 		var team1_pts = 0;
 		var team2_win = 0;
 		var team2_draw = 0;
 		var team2_loss = 0;
-		var team2_goal_diff = 0;
 		var team2_pts = 0;
 
 		if(adjusted_score1 > adjusted_score2){
@@ -149,7 +148,7 @@ function calculateMatchResults(json, matchday){
 		//Store the stats for the team in the salaries array:
 		addTeamStatsToSalariesArray(year, team1, matchday, team1_win, team1_draw, team1_loss, adjusted_score1, adjusted_score2, team1_goal_diff, team1_pts);
 
-		addTeamStatsToSalariesArray(year, team2, matchday, team2_win, team2_draw, team2_loss, adjusted_score2, adjusted_score1, team2_goal_diff, team2_pts)
+		addTeamStatsToSalariesArray(year, team2, matchday, team2_win, team2_draw, team2_loss, adjusted_score2, adjusted_score1, team2_goal_diff, team2_pts);
 
 		console.log("With new additions to the salary object, salaries = ");
 		console.dir(salaries["2016"]);
@@ -159,10 +158,10 @@ function calculateMatchResults(json, matchday){
 	//Send the updated salaries array. And the main js file will display the adjusted league table.
 	var workerResult = salaries;
 	var currentYearArray = salaries["2016"];
-	for(index in currentYearArray){
+	for(var index in currentYearArray){
 		var value = currentYearArray[index];
-		if(value.team == "Málaga CF"){
-			console.log("Malaga found. Its stats: ");
+		if(value.team == "FC Barcelona"){
+			console.log("Barcelona found. Its stats: ");
 			console.log("salary= " + value.salary);
 			console.log("w= " + value.w);
 			console.log("d= " + value.d);
@@ -180,16 +179,16 @@ function calculateMatchResults(json, matchday){
 }
 
 function addTeamStatsToSalariesArray(year, team, matchday, win, draw, loss, goals_for, goals_against, goal_diff, pts){
-	for(index in salaries){
+	for(var index in salaries){
 		var value = salaries[index];
 		if(index == year){
-			for(i in value){
+			for(var i in value){
 				var val = value[i];
 				if(val.team == team){
 					console.log("Team = " + val.team);
 					//If the keys for the new stats don't exist yet (mp, w, d, l, gf, etc), create them and set their values to 0:
 					if(!("mp" in val)) {
-						console.log("Keys for new stats don't exist yet sp adding them.");
+						console.log("Keys for new stats don't exist yet so adding them.");
 						val.mp = 0;
 						val.w = 0;
 						val.d = 0;

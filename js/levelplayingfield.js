@@ -141,7 +141,7 @@ $(document).ready(function(){
 		if(window.Worker){
 			//Create a web worker to do the calculations for the league table in order to run the script in a background thread. The worker thread can perform tasks without interfering with the user interface:
 			//Reference : https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
-			var calculateLeagueTableWorker = new Worker("js/worker.js");
+			var calculateLeagueTableWorker = new Worker("js/worker.js?1");
 
 			//Message sent to worker with postMessage() method:
 			calculateLeagueTableWorker.postMessage([currentMatchNumber, season, salaries]);
