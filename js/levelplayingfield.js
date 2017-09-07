@@ -139,7 +139,7 @@ $(document).ready(function(){
 
 	function calculateAdjustedLeagueTable(){
 		if(window.Worker){
-			//Create a web worker to do the calculations for the league table in order to run the script in a background thread. The worker thread can perform tasks without interfering with the user interface:
+			//Creates a web worker to do the calculations for the league table in order to run the script in a background thread. The worker thread can perform tasks without interfering with the user interface.
 			//Reference : https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
 			var calculateLeagueTableWorker = new Worker("js/worker.js?1");
 
@@ -270,64 +270,47 @@ $(document).ready(function(){
 	}
 
 	function displayAdustedLeagueTable(adjustedStats){
-		var year = year;
-		var season = year + "-" + (year+1);
-		//var lastMatchPlayed = json.matchday;
+		var year = season.year;
 		var stats = '<table class="results-list table table-striped table-bordered table-sm">';
-
-		//For testing:
-		stats += '<tbody>';
+		stats += '<thead>';
 		stats += '<tr>';
-		stats += '<td>';
-		stats += 'Adjusted league table will display here!';
-		stats += '</td>';
+		stats += '<th>Team</th>';
+		stats += '<th>MP</th>'; //Matches played
+		stats += '<th>W</th>'; //Wins
+		stats += '<th>D</th>'; //Draws
+		stats += '<th>L</th>'; //Losses
+		stats += '<th>GF</th>'; //Goals for
+		stats += '<th>GA</th>'; //Goals against
+		stats += '<th>GD</th>'; //Goal difference
+		stats += '<th>PTS</th>'; //Points
 		stats += '</tr>';
+		stats += '</thead>';
 		stats += '</tbody>';
 
-
-		// stats += '<thead>';
-		// stats += '<tr>';
-		// stats += '<th>Team</th>';
-		// stats += '<th>MP</th>'; //Matches played
-		// stats += '<th>W</th>'; //Wins
-		// stats += '<th>D</th>'; //Draws
-		// stats += '<th>L</th>'; //Losses
-		// stats += '<th>GF</th>'; //Goals for
-		// stats += '<th>GA</th>'; //Goals against
-		// stats += '<th>GD</th>'; //Goal difference
-		// stats += '<th>PTS</th>'; //Points
-		// stats += '</tr>';
-		// stats += '</thead>';
-		// stats += '</tbody>';
-
-		// //The teams in salaryArrayWithAdjustedStatsAdded need to be ordered by descreasing pts. 
-		// $.each(json.standing, function(index,value){
-		// 	var team = value.teamName;
-		// 	var matchesPlayed = value.playedGames;
-		// 	var wins = value.wins;
-		// 	var draws = value.draws;
-		// 	var losses = value.losses;
-		// 	var goalsFor = value.goals;
-		// 	var goalsAgainst = value.goalsAgainst;
-		// 	var goalDifference = value.goalDifference;
-		// 	var points = value.points;
-		// 	stats += '<tr>';
-		// 	stats += '<td>' + team + '</td>';
-		// 	stats += '<td>' + matchesPlayed + '</td>';
-		// 	stats += '<td>' + wins + '</td>';
-		// 	stats += '<td>' + draws + '</td>';
-		// 	stats += '<td>' + losses + '</td>';
-		// 	stats += '<td>' + goalsFor + '</td>';
-		// 	stats += '<td>' + goalsAgainst + '</td>';
-		// 	stats += '<td>' + goalDifference + '</td>';
-		// 	stats += '<td>' + points + '</td>';
-		// 	//Use the web worker to calculate and display the adjusted league table instead of doing it here:
-		// 	stats += '<td class="adjusted-score">' + adjusted_scores.score1 + '</td>';
-		// 	stats += '<td class="adjusted-score">' + adjusted_scores.score2 + '</td>';
-		// 	stats += '<td class="adjusted-score">' + adjusted_scores.score2 + '</td>';
-		// 	stats += '<td class="adjusted-score">' + adjusted_scores.score2 + '</td>';
-		// 	stats += '</tr>';
-		// });
+		//To do: The teams in salaryArrayWithAdjustedStatsAdded need to be ordered by descreasing pts. 
+		$.each(adjustedStats[year], function(index,value){
+			var team = value.team;
+			var matchesPlayed = value.mp;
+			var wins = value.w;
+			var draws = value.d;
+			var losses = value.l;
+			var goalsFor = value.gf;
+			var goalsAgainst = value.ga;
+			var goalDifference = value.gd;
+			var points = value.pts;
+			stats += '<tr>';
+			stats += '<td>' + team + '</td>';
+			stats += '<td>' + matchesPlayed + '</td>';
+			stats += '<td>' + wins + '</td>';
+			stats += '<td>' + draws + '</td>';
+			stats += '<td>' + losses + '</td>';
+			stats += '<td>' + goalsFor + '</td>';
+			stats += '<td>' + goalsAgainst + '</td>';
+			stats += '<td>' + goalDifference + '</td>';
+			stats += '<td>' + points + '</td>';
+			//To do: add a class if the results are different from the non-adjusted league table's results
+			stats += '</tr>';
+		});
 
 		stats += '</tbody';
 		stats += '</table>';

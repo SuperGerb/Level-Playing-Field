@@ -16,17 +16,15 @@ onmessage = function(e){
 	var seasonYear = e.data[1].year;
 	//The salaries object:
 	salaries = e.data[2];
+	
+	//Problem: I made too many requests to the API 
+	//Adjust and sum team stats for all matchdays less than or equal to currentMatch:
+	for(var i = 1; i <= currentMatch; i++){
+		getParticularMatch(i, seasonId);
+	}
 
-	console.log("Salaries.2016 array received from main.js equals: ");
-	console.dir(salaries["2016"]);
-
-	//Commented for testing: 
-	//getParticularMatch(matchday, seasonId); For all matchdays less than or equal to currentMatch:
-	// for(var i = 1; i <= currentMatch; i++){
-	// 	getParticularMatch(i,seasonId);
-	// }
-
-	getParticularMatch(1, seasonId);
+	//For testing. Make a unit test with this: 
+	//getParticularMatch(1, seasonId);
 }
 
 function lookupTeamSalary(team, year){
@@ -81,7 +79,7 @@ function getParticularMatch(matchday, seasonId){
 	 
 	 req.onreadystatechange = function() {  
 		if (this.readyState == 4 && this.status == 200) {  
-			console.log("Ready state.");
+			//console.log("Ready state.");
 		 	var response = JSON.parse(this.responseText);
 			 calculateMatchResults(response, matchday);
 		}
@@ -89,13 +87,12 @@ function getParticularMatch(matchday, seasonId){
 }
 
 function calculateMatchResults(json, matchday){
-	console.log("Called in worker for matcheroo " + matchday);
+	console.log("Called in worker for match " + matchday);
 	var y = new Date(json.fixtures[0].date);
 	var year = y.getFullYear();
 	var fixtures = json.fixtures;
 
 	for(var index in fixtures) { 
-		console.log("Round " + index);
 		var value = fixtures[index];	
     	var team1 = value.homeTeamName;
     	var team2 = value.awayTeamName;
@@ -149,9 +146,6 @@ function calculateMatchResults(json, matchday){
 		addTeamStatsToSalariesArray(year, team1, matchday, team1_win, team1_draw, team1_loss, adjusted_score1, adjusted_score2, team1_goal_diff, team1_pts);
 
 		addTeamStatsToSalariesArray(year, team2, matchday, team2_win, team2_draw, team2_loss, adjusted_score2, adjusted_score1, team2_goal_diff, team2_pts);
-
-		console.log("With new additions to the salary object, salaries = ");
-		console.dir(salaries["2016"]);
 	};
 
 	//Message sent back to the main script with the postMessage() method:
@@ -161,19 +155,19 @@ function calculateMatchResults(json, matchday){
 	for(var index in currentYearArray){
 		var value = currentYearArray[index];
 		if(value.team == "FC Barcelona"){
-			console.log("Barcelona found. Its stats: ");
-			console.log("salary= " + value.salary);
-			console.log("w= " + value.w);
-			console.log("d= " + value.d);
-			console.log("l= " + value.l);
-			console.log("gf= " + value.gf);
-			console.log("ga= " + value.ga);
-			console.log("gd= " + value.gd);
-			console.log("pts= " + value.pts);
+			//console.log("Barcelona found. Its stats: ");
+			//console.log("salary= " + value.salary);
+			//console.log("w= " + value.w);
+			//console.log("d= " + value.d);
+			//console.log("l= " + value.l);
+			//console.log("gf= " + value.gf);
+			//console.log("ga= " + value.ga);
+			//console.log("gd= " + value.gd);
+			//console.log("pts= " + value.pts);
 		}
 	}	
 	// Another example: var workerResult = "Result: " + e.data[0] + ", " + e.data[1].id + ", " + e.data[2] ;
-	console.log("Posting message back to main script");
+	console.log("Posting message from worker back to main script");
 	//The worker sends the updated salaries array to the main js file:
 	postMessage(workerResult);
 }
@@ -185,10 +179,10 @@ function addTeamStatsToSalariesArray(year, team, matchday, win, draw, loss, goal
 			for(var i in value){
 				var val = value[i];
 				if(val.team == team){
-					console.log("Team = " + val.team);
+					//console.log("Team = " + val.team);
 					//If the keys for the new stats don't exist yet (mp, w, d, l, gf, etc), create them and set their values to 0:
 					if(!("mp" in val)) {
-						console.log("Keys for new stats don't exist yet so adding them.");
+						//console.log("Keys for new stats don't exist yet so adding them.");
 						val.mp = 0;
 						val.w = 0;
 						val.d = 0;
@@ -198,7 +192,7 @@ function addTeamStatsToSalariesArray(year, team, matchday, win, draw, loss, goal
 						val.gd = 0;
 						val.pts = 0;
 					}
-					console.log("Stats now being updated for " + val.team + ".");
+					//console.log("Stats now being updated for " + val.team + ".");
 					val.mp = matchday;
 					val.w += win;
 					val.d += draw;
