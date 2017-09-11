@@ -151,10 +151,11 @@ function calculateMatchResults(json, matchday){
 	//Message sent back to the main script with the postMessage() method:
 	//Send the updated salaries array. And the main js file will display the adjusted league table.
 	var workerResult = salaries;
-	var currentYearArray = salaries["2016"];
-	for(var index in currentYearArray){
-		var value = currentYearArray[index];
-		if(value.team == "FC Barcelona"){
+	//For testing:
+	// var currentYearArray = salaries["2017"];
+	// for(var index in currentYearArray){
+	// 	var value = currentYearArray[index];
+	// 	if(value.team == "FC Barcelona"){
 			//console.log("Barcelona found. Its stats: ");
 			//console.log("salary= " + value.salary);
 			//console.log("w= " + value.w);
@@ -164,8 +165,8 @@ function calculateMatchResults(json, matchday){
 			//console.log("ga= " + value.ga);
 			//console.log("gd= " + value.gd);
 			//console.log("pts= " + value.pts);
-		}
-	}	
+		// }
+	//}	
 	// Another example: var workerResult = "Result: " + e.data[0] + ", " + e.data[1].id + ", " + e.data[2] ;
 	console.log("Posting message from worker back to main script");
 	//The worker sends the updated salaries array to the main js file:

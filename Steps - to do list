@@ -17,17 +17,23 @@ You don’t (synchronously) wait for the results of a long-running computation (
 3. DONE
 Display league table of modified results
 
-3.1
-Write a unit test to check if it’s actually doing the calculations properly
+4. DONE
+Update to current season 
 
-4.
-Display “Loading adjusted league table” with spinner icon until ready to display.
-
-5.
+5. DONE
 Order the teams in adjusted League table by decreasing pts 
 
 6.
-Add a class if the results are different from the non-adjusted league table's results
+Display “Loading adjusted league table” with spinner icon until ready to display.
 
 7.
-Update to current season (2017-2018 if it’s already begun)
+Add a class if the results are different from the non-adjusted league table's results
+
+8.
+Write a unit test to check if it’s actually doing the calculations properly
+
+9.
+Deal with the issue of maxing out number of API calls (50/minute)! Will become a problem with the adjusted league table.
+
+10.
+Make work on mobile

@@ -1,5 +1,6 @@
 $(document).ready(function(){
-	var season = {id: 436, year: 2016}; //436 = 2016-2017 season
+	var season = {id: 455, year: 2017}; //455 = 2017-2018 season
+									 	//436 = 2016-2017 season
 	var responseObj;
 	var currentMatchNumberSet = false;
 	var currentMatchNumber = 0;
@@ -32,29 +33,26 @@ $(document).ready(function(){
 		],
 		//2017-2018:
 		2017: [
-			{team: "Deportivo Alavés", salary: 38.05},
+			{team: "Deportivo Alavés", salary: 38.05}, //-
 			{team: "Athletic Club", salary: 167.60}, // = Bilbao
-			{team: "Club Atlético de Madrid", salary: 512},
-			{team: "FC Barcelona", salary: 681.50},
+			{team: "Club Atlético de Madrid", salary: 512}, //-
+			{team: "FC Barcelona", salary: 681.50}, //-
 			{team: "RC Celta de Vigo", salary: 110.40},
-			{team: "RC Deportivo La Coruna", salary: 63.20},
-			{team: "SD Eibar", salary: 64.80},
-			{team: "RCD Espanyol", salary: 65.90},
-			//Getafe {team: "getafe", salary: 32.30},
-			//Girona {team: "girona", salary: 25.50},
-			{team: "Sporting Gijón", salary: 1.44},//Asturias Sporting Gijón or simply Sporting, 2 division
-			{team: "Granada CF", salary: 1.08},
-			//Levante {team: "levante", salary: 27.35},
-			{team: "CD Leganes", salary: 40.70},
-			{team: "UD Las Palmas", salary: 95.70},
-			{team: "Málaga CF", salary: 64.65},
-			{team: "CA Osasuna", salary: 0.916}, //Pamplona, 2 division
-			{team: "Real Betis", salary: 74.10},
-			{team: "Real Madrid CF", salary: 714.80},
-			{team: "Real Sociedad de Fútbol", salary: 155.50},
-			{team: "Sevilla FC", salary: 222.50},
-			{team: "Valencia CF", salary: 154.10},
-			{team: "Villarreal CF", salary: 180.20}
+			{team: "RC Deportivo La Coruna", salary: 63.20}, //-
+			{team: "SD Eibar", salary: 64.80}, //-
+			{team: "RCD Espanyol", salary: 65.90}, //-
+			{team: "Getafe CF", salary: 32.30}, //-
+			{team: "Girona FC", salary: 25.50}, //-
+			{team: "Levante UD", salary: 27.35}, //-
+			{team: "CD Leganes", salary: 40.70}, //-
+			{team: "UD Las Palmas", salary: 95.70}, //-
+			{team: "Málaga CF", salary: 64.65}, //-
+			{team: "Real Betis", salary: 74.10}, //-
+			{team: "Real Madrid CF", salary: 714.80}, //-
+			{team: "Real Sociedad de Fútbol", salary: 155.50}, //-
+			{team: "Sevilla FC", salary: 222.50}, //-
+			{team: "Valencia CF", salary: 154.10}, //-
+			{team: "Villarreal CF", salary: 180.20} //-
 		]
 	};
 
@@ -141,7 +139,7 @@ $(document).ready(function(){
 		if(window.Worker){
 			//Creates a web worker to do the calculations for the league table in order to run the script in a background thread. The worker thread can perform tasks without interfering with the user interface.
 			//Reference : https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
-			var calculateLeagueTableWorker = new Worker("js/worker.js?1");
+			var calculateLeagueTableWorker = new Worker("js/worker.js?2");
 
 			//Message sent to worker with postMessage() method:
 			calculateLeagueTableWorker.postMessage([currentMatchNumber, season, salaries]);
@@ -179,9 +177,10 @@ $(document).ready(function(){
 
 	//To get the list of 1 division teams:
 	function getListOfTeams(){
+		var seasonId = season.id;
 		$.ajax({
 		 	headers: { 'X-Auth-Token': '7ff8904b117547748572064ac1e28265' },
-			url: 'http://api.football-data.org/v1/competitions/455/teams',
+			url: 'http://api.football-data.org/v1/competitions/' + seasonId + '/teams',
 		  	dataType: 'json',
 		  	type: 'GET',
 		}).done(function(response) {
@@ -271,7 +270,25 @@ $(document).ready(function(){
 
 	function displayAdustedLeagueTable(adjustedStats){
 		var year = season.year;
-		var stats = '<table class="results-list table table-striped table-bordered table-sm">';
+		var stats = '';
+		var currentYearsAdjStats = adjustedStats[year];
+		
+		//Sort the teams in order of descreasing pts: 
+		//If number of pts the same, sort by descending goal differential (gd).
+		//And if goal differential is the same, sort by goals for (gf).
+		//To compare numbers,the compare function can simply subtract b from a:
+		/*The compareFunction can be invoked multiple times per element within the array. Depending on the compareFunction's nature, this may yield a high overhead. The more work a compareFunction does and the more elements there are to sort, the wiser it may be to consider using a map for sorting.*/
+		currentYearsAdjStats.sort(function (a, b) {
+			if(b.pts != a.pts){
+				return b.pts - a.pts;				
+			}else if(b.gd != a.gd){ 
+				return b.gd - a.gd;
+			}else{
+				return b.gf - a.gf;
+			}
+		});
+	
+		stats += '<table class="results-list table table-striped table-bordered table-sm">';
 		stats += '<thead>';
 		stats += '<tr>';
 		stats += '<th>Team</th>';
@@ -287,8 +304,7 @@ $(document).ready(function(){
 		stats += '</thead>';
 		stats += '</tbody>';
 
-		//To do: The teams in salaryArrayWithAdjustedStatsAdded need to be ordered by descreasing pts. 
-		$.each(adjustedStats[year], function(index,value){
+		$.each(currentYearsAdjStats, function(index,value){
 			var team = value.team;
 			var matchesPlayed = value.mp;
 			var wins = value.w;
