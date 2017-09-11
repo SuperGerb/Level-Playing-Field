@@ -3,7 +3,7 @@ Get current league table
   - get matchday (= number of last match played)
   - display results of last match played by calling getParticularMatch(matchday)
 
-2. DONE but needs to be tested and number of API calls maxed out. LOOK INTO.
+2. DONE but needs to be tested and number of API calls maxed out.
 Calculate and add results of all matches <= matchday 
 
 
@@ -23,7 +23,7 @@ Update to current season
 5. DONE
 Order the teams in adjusted League table by decreasing pts 
 
-6.
+6. DONE
 Display “Loading adjusted league table” with spinner icon until ready to display.
 
 7.

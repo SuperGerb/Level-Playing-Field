@@ -21,6 +21,10 @@ include("inc/header.php"); ?>
 	</div>
 	<div class="results-wrap">
 		<h2><span class="year-league"></span> La Liga Adjusted Results</h2>
+		<div class="loader-wrap">
+			<div class="loader"></div>
+			<p>Calculating adjusted league table results...</p>
+		</div>
 		<div id="adjusted-results"></div>
 	</div>
 

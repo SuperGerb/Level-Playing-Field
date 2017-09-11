@@ -72,9 +72,9 @@ $(document).ready(function(){
 	};
 
 	function init(){
-		//getParticularMatch(currentMatchNumber);
 		getCurrentMatchNumber(); //#1 in the call stack
 		getCurrentLeagueTable();
+
 		/* Question about asynchronous programming :
 		How to get getParticularMatch(currentMatchNumber) has to happen once getCurrentMatchNumber() is completed? 
 		Either return currentMatchNumer in getCurrentMatchNumer and write
@@ -331,6 +331,7 @@ $(document).ready(function(){
 		stats += '</tbody';
 		stats += '</table>';
 		$('#adjusted-results').html(stats);
+		$('.loader-wrap').hide();
 	}
 
 	function displayMatchResults(json, matchday){
