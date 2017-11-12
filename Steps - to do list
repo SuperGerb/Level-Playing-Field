@@ -33,7 +33,10 @@ Add a class if the results are different from the non-adjusted league table's re
 Write a unit test to check if it’s actually doing the calculations properly
 
 9.
-Deal with the issue of maxing out number of API calls (50/minute)! Will become a problem with the adjusted league table.
+Create a server (node) and save to cache in order to deal with the issue of maxing out number of API calls (50/minute)! See the hand-written note from Andre, as well as 
+https://www.npmjs.com/package/memory-cache,
+https://github.com/maison-notman-house/notman-api-server/blob/master/lib/services/events/index.js :  an example of how they use server caching at Notman House, and 
+https://www.heroku.com/pricing potentially, for hosting a node server. I could maybe make it open source for the time being, to qualify for free hosting, and then reassess later
 
 10.
 Make work on mobile

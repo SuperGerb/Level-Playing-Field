@@ -1,0 +1,68 @@
+<html>
+
+<head>
+    <title>Level Playing Field</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/style.css?1" type="text/css">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Oswald:400,700" type="text/css">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ"
+        crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="header">
+        <h1 class="app-title">Level Playing Field</h1>
+    </div>
+    <div class="content">
+        <p class="adj-desc">If the ratio of the two teams' salaries is greater than 3, adjustments will be made!!
+            <span>
+                <em>*Unless the poorer team is the home team and the ratio isn't more than 6.</em>
+            </span>
+        </p>
+
+        <div class="results-wrap">
+            <h2>
+                <span class="year"></span> Match
+                <span class="match"></span> Results</h2>
+            <div id="results-match"></div>
+        </div>
+        <div class="results-wrap">
+            <h2>
+                <span class="year"></span> Match
+                <span class="match"></span> Adjusted Results</h2>
+            <div id="adjusted-match-results"></div>
+        </div>
+
+        <div id="selects-zone"></div>
+
+        <div class="results-wrap">
+            <h2>
+                <span class="year-league"></span> La Liga Season Results</h2>
+            <div id="results"></div>
+        </div>
+        <div class="results-wrap">
+            <h2>
+                <span class="year-league"></span> La Liga Adjusted Results</h2>
+            <div class="loader-wrap">
+                <div class="loader"></div>
+                <p>Calculating adjusted league table results...</p>
+            </div>
+            <div id="adjusted-results"></div>
+        </div>
+    </div><!-- end .content -->
+	
+	<div class="footer">
+		<p class="copyright">&copy;Level playing field</p>
+	</div>
+	
+	<script
+		src="https://code.jquery.com/jquery-3.1.1.min.js"
+		integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+		crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+	<script src="js/levelplayingfield.js"></script>
+</body>
+</html>
+	
