@@ -73,7 +73,7 @@ var adjustmentSchemes = {
 //To get a particular match (in Javascript, because jQuery not accepted in web workers, since the DOM can't be directly manipulated from inside a worker): 
 function getParticularMatch(matchday, seasonId){
 	 var req = new XMLHttpRequest();  
-	 req.open('GET', 'http://api.football-data.org/v1/competitions/' + seasonId + '/fixtures?matchday=' + matchday);  
+	 req.open('GET', '/api/competitions/' + seasonId + '/fixtures?matchday=' + matchday);  
 	 req.setRequestHeader('X-Auth-Token', '7ff8904b117547748572064ac1e28265');
 	 req.send();
 	 
