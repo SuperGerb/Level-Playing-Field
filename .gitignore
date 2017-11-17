@@ -1,0 +1,14 @@
+#################
+## OS detritus
+#################
+# Mac
+.DS_Store
+
+# Visual studio code
+.vscode/
+
+#################
+# codebase files to ignore
+#################
+node_modules/
+notes-documentation/

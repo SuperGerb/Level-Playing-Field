@@ -1,9 +1,7 @@
 $(document).ready(function () {
     var season = { id: 455, year: 2017 }; //455 = 2017-2018 season
     //436 = 2016-2017 season
-    var responseObj;
-    var currentMatchNumberSet = false;
-    var currentMatchNumber = 0;
+    var currentMatchdayNumber;
 
     var salaries = {
 		/* Salary info from: https://www.transfermarkt.com/laliga/startseite/wettbewerb/ES1/plus/?saison_id=2017, in pounds.
@@ -57,12 +55,12 @@ $(document).ready(function () {
     };
 
     function init() {
-        getCurrentMatchNumber();
+        getCurrentMatchdayNumber();
         getCurrentLeagueTable();
     }
 
-    //Get current match number (ie. what was the last match played):
-    function getCurrentMatchNumber() {
+    //Get current matchday number (ie. what was the last match day played):
+    function getCurrentMatchdayNumber() {
         var seasonId = season.id;
         var seasonYr = season.year;
         var seasonYrSpan = seasonYr + "-" + seasonYr + 1;
@@ -75,17 +73,16 @@ $(document).ready(function () {
         }).done(function (response) {
             //Set the global variable to the current match day:
             //I added -1 because there are often a lot of matches that haven't been played yet since we're in a different time zone. To do: make a better solution!! 
-            currentMatchNumber = response.matchday - 1;
-            ///// --->  memoryCache.put('currentMatchNumber', currentMatchNumber, 100); Need to do this server side. How?
-            console.log("Current match number = " + currentMatchNumber);
+            currentMatchdayNumber = response.matchday - 1;
+            console.log("Current matchday is = " + currentMatchdayNumber);
             //Send the current match day to the web worker so it can calculate the adjusted league table: (Might as well call it as soon as possible because it's going to be working in the background and will just notify me when it's finished):
             calculateAdjustedLeagueTable();
             //Display current match results:
-            getParticularMatch(currentMatchNumber); //I couldn't call this elsewhere... see question on asynchronous programming
+            getParticularMatchdayResults(currentMatchdayNumber);
         });
     }
 
-    //To get league table/current standing:
+    //To get league table/current standings:
     function getCurrentLeagueTable() {
         var seasonId = season.id;
         var seasonYr = season.year;
@@ -97,13 +94,12 @@ $(document).ready(function () {
             dataType: 'json',
             type: 'GET',
         }).done(function (response) {
-            responseObj = response;
-            displayCurrentLeagueTable(responseObj, seasonYr);
+            displayCurrentLeagueTable(response, seasonYr);
         });
     }
 
-    //To get a particular match: 
-    function getParticularMatch(matchday) {
+    //To get the results of a particular match day: 
+    function getParticularMatchdayResults(matchday) {
         var seasonId = season.id;
         $.ajax({
             // headers: { 'X-Auth-Token': '7ff8904b117547748572064ac1e28265' },
@@ -112,7 +108,7 @@ $(document).ready(function () {
             dataType: 'json',
             type: 'GET',
         }).done(function (response) {
-            displayMatchResults(response, matchday);
+            displayMatchdayResults(response, matchday);
         });
     }
 
@@ -123,7 +119,7 @@ $(document).ready(function () {
             var calculateLeagueTableWorker = new Worker("js/worker.js?2");
 
             //Message sent to worker with postMessage() method:
-            calculateLeagueTableWorker.postMessage([currentMatchNumber, season, salaries]);
+            calculateLeagueTableWorker.postMessage([currentMatchdayNumber, season, salaries]);
             console.log('Message posted to worker');
 
             //And received by the onmessage event handler:
@@ -137,7 +133,7 @@ $(document).ready(function () {
         }
     }
 
-    //To get the list of 1 division teams:
+    //To get the list of division 1 teams:
     function getListOfTeams() {
         var seasonId = season.id;
         $.ajax({
@@ -311,8 +307,9 @@ $(document).ready(function () {
         $('.loader-wrap').hide();
     }
 
-    function displayMatchResults(json, matchday) {
-        console.log("Called for match " + matchday);
+    //Generates the table for the match day results as well as for the adjusted matchday results. (Displays the same table twice, since the tables are predominantly the same, and hides the extra scores columns with css):
+    function displayMatchdayResults(json, matchday) {
+        console.log("Called for matchday " + matchday);
         var y = new Date(json.fixtures[0].date);
         var season = y.getFullYear();
         var year = y.getFullYear();
@@ -330,7 +327,7 @@ $(document).ready(function () {
         stats += '</thead>';
         stats += '<tbody>';
 
-        //.each : Iterate over a jQuery object, executing a function for each matched element. (The equivalent of for(index in associativeArray) in JavaScript)
+        //For each match in the fixtures table, fill in the 
         $.each(json.fixtures, function (index, value) {
             var team1 = value.homeTeamName;
             var team2 = value.awayTeamName;
@@ -339,8 +336,6 @@ $(document).ready(function () {
             var adjusted_scores = {};
             var team1_salary = lookupTeamSalary(team1, year);
             var team2_salary = lookupTeamSalary(team2, year);
-            var totalAdjustmentSchemes = Object.keys(adjustmentSchemes).length;
-            //The Object.keys() method returns an array of a given object's own enumerable properties
             var d = new Date(value.date);
             var day = d.getDate();
             var mon = d.getMonth();
@@ -391,7 +386,7 @@ $(document).ready(function () {
     // 	console.log("Changed");
     // 	var matchday = $("#matchSelection option:selected").val();
     // 	console.log(matchday);
-    // 	getParticularMatch(matchday);
+    // 	getParticularMatchdayResults(matchday);
     // });
 
     //$("#adjust-results").on("click", init());
