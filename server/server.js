@@ -6,34 +6,42 @@ const request = require('request-promise');
 const app = express();
 const absPathToIndex = path.join(__dirname, '..', 'app');
 const minutes = 60000;
+const days = 86400000;
 const cacheTimeout = 60 * minutes;
+//I wanted to specify a much longer timeframe for past match day data, however it seemed to be rejected by the cache:
+//const longCacheTimeout = 30 * days;
+//To do: what is the maximum I can put this to?:
+const longCacheTimeout = 60 * minutes;
+
+var currentMatchday;
 
 //To serve a static page (index.html):
 app.use(express.static(absPathToIndex));
 
-app.get('/', function(req, res){
+app.get('/', function (req, res) {
     res.sendFile(path.join(absPathToIndex, 'index.html'));
 });
 
-app.get('/api/competitions/:seasonId/:subService', function(req, res) {
-    const {seasonId, subService} = req.params;
-    console.log('>>> seasonId: ', seasonId);
+app.get('/api/competitions/:seasonId/:subService', function (req, res) {
+    const { seasonId, subService } = req.params;
 
-    //Just for testing. Remove:
-    memoryCache.clear();
+    //Just for testing:
+    //console.log("Number of items in memory cache: ", memoryCache.size());
+    //Just for testing:
+    //memoryCache.clear();
 
-    //Url is used as key, in order to support request with varying parameters:
+    //Url (inherited from Node's http module) is used as key, in order to support request with varying parameters. It includes all parameters and query strings:
     var cachedResponse = memoryCache.get(req.url);
 
     //Check whether the requested information exists in cache. If so, send it to the browser and exit (return):
     if (cachedResponse !== null) {
         console.info(`Returning cached content for ${req.url}`);
-        res.send(cachedResponse);
+        res.send(cachedResponse); 
         return;
     }
-    
+
     const url = `http://api.football-data.org/v1/competitions/${seasonId}/${subService}`;
-    
+
     //If not, request the information from the API server and save it to cache. (Syntax is a request with promises (uses request-promise module):
     var options = {
         method: 'GET',
@@ -43,13 +51,29 @@ app.get('/api/competitions/:seasonId/:subService', function(req, res) {
         headers: {
             'X-Auth-Token': '7ff8904b117547748572064ac1e28265'
         }
-    }; 
+    };
+    //Recall req.query is an object containing a property for each query string parameter in the route 
+
     console.info(`Retrieving content remotely at ${url}`);
 
     request(options)
         .then((response) => {
-            console.log('>>> response: ', response.body);
-            memoryCache.put(req.url, response.body, cacheTimeout);
+            //This works, but will be more meaningful when there cacheTimeout and longCacheTimeout have different values:
+            if (subService === "leagueTable") {
+                currentMatchday = JSON.parse(response.body).matchday - 1;
+                console.log("subService is: " + subService + " and currentMatchday is : " + currentMatchday);
+                console.log("and req.url is ", req.url);
+            } else if ((subService === "fixtures" && req.query.matchday == currentMatchday) || (subService === "fixtures" && req.query.matchday === undefined)) {
+                console.log(req.query.matchday + " matches " + currentMatchday + " so short cacheTimeout being used");
+                memoryCache.put(req.url, response.body, cacheTimeout);
+                console.log("and req.url is ", req.url);
+            } else {
+                console.log(req.query.matchday + " doesn't match current match day: " + currentMatchday + " so LONG cacheTimeout being used");
+                memoryCache.put(req.url, response.body, longCacheTimeout);
+                console.log("and req.url is ", req.url);
+            }
+            console.log('>>> response being served from the API');
+           // memoryCache.put(req.url, response.body, cacheTimeout);
             res.send(response.body);
         })
         .catch((error) => {

@@ -65,8 +65,7 @@ $(document).ready(function () {
         var seasonYr = season.year;
         var seasonYrSpan = seasonYr + "-" + seasonYr + 1;
         $.ajax({
-            //headers: { 'X-Auth-Token': '7ff8904b117547748572064ac1e28265' },
-            //url: 'http://api.football-data.org/v1/competitions/' + seasonId + '/leagueTable',
+            //This could be shortened to '/api/competitions/' + seasonId' but requires adjustments on the backend
             url: '/api/competitions/' + seasonId + '/leagueTable',
             dataType: 'json',
             type: 'GET',
@@ -75,7 +74,7 @@ $(document).ready(function () {
             //I added -1 because there are often a lot of matches that haven't been played yet since we're in a different time zone. To do: make a better solution!! 
             currentMatchdayNumber = response.matchday - 1;
             console.log("Current matchday is = " + currentMatchdayNumber);
-            //Send the current match day to the web worker so it can calculate the adjusted league table: (Might as well call it as soon as possible because it's going to be working in the background and will just notify me when it's finished):
+            //Send the current match day to the web worker so it can start calculating the adjusted league table: 
             calculateAdjustedLeagueTable();
             //Display current match results:
             getParticularMatchdayResults(currentMatchdayNumber);
@@ -88,8 +87,6 @@ $(document).ready(function () {
         var seasonYr = season.year;
         var seasonYrSpan = seasonYr + "-" + seasonYr + 1;
         $.ajax({
-            //headers: { 'X-Auth-Token': '7ff8904b117547748572064ac1e28265' },
-            // url: 'http://api.football-data.org/v1/competitions/' + seasonId + '/leagueTable',
             url: '/api/competitions/' + seasonId + '/leagueTable',            
             dataType: 'json',
             type: 'GET',
@@ -102,8 +99,6 @@ $(document).ready(function () {
     function getParticularMatchdayResults(matchday) {
         var seasonId = season.id;
         $.ajax({
-            // headers: { 'X-Auth-Token': '7ff8904b117547748572064ac1e28265' },
-            // url: 'http://api.football-data.org/v1/competitions/' + seasonId + '/fixtures?matchday=' + matchday,
             url: '/api/competitions/' + seasonId + '/fixtures?matchday=' + matchday,            
             dataType: 'json',
             type: 'GET',
