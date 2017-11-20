@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const memoryCache = require('memory-cache');
 const request = require('request-promise');
+const PORT = process.env.PORT || 8080;
 
 const app = express();
 const absPathToIndex = path.join(__dirname, '..', 'app');
@@ -86,4 +87,4 @@ app.get('/api/competitions/:seasonId/:subService', function (req, res) {
 });
 
 
-app.listen(8080);
+app.listen(PORT);
