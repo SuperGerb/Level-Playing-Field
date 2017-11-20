@@ -12,6 +12,7 @@
         "express": "^4.16.2",
         "memory-cache": "^0.2.0",
         "nodemon": "^1.12.1",
+        "request": "^2.83.0",
         "request-promise": "^4.2.2"
     },
     "scripts": {
