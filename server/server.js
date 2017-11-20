@@ -1,3 +1,4 @@
+const config = require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const memoryCache = require('memory-cache');
@@ -12,6 +13,8 @@ const cacheTimeout = 60 * minutes;
 //const longCacheTimeout = 30 * days;
 //To do: what is the maximum I can put this to?:
 const longCacheTimeout = 60 * minutes;
+
+
 
 var currentMatchday;
 
@@ -42,14 +45,14 @@ app.get('/api/competitions/:seasonId/:subService', function (req, res) {
 
     const url = `http://api.football-data.org/v1/competitions/${seasonId}/${subService}`;
 
-    //If not, request the information from the API server and save it to cache. (Syntax is a request with promises (uses request-promise module):
+    //If not, request the information from the API server and save it to cache. (Syntax is a request with promises (uses request-promise module)):
     var options = {
         method: 'GET',
         uri: url,
         qs: req.query,
         resolveWithFullResponse: true,
         headers: {
-            'X-Auth-Token': '7ff8904b117547748572064ac1e28265'
+            'X-Auth-Token': process.env.MY_KEY
         }
     };
     //Recall req.query is an object containing a property for each query string parameter in the route 
