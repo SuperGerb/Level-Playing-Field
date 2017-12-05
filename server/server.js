@@ -15,8 +15,6 @@ const cacheTimeout = 60 * minutes;
 //To do: what is the maximum I can put this to?:
 const longCacheTimeout = 60 * minutes;
 
-
-
 var currentMatchday;
 
 //To serve a static page (index.html):
@@ -32,7 +30,7 @@ app.get('/api/competitions/:seasonId/:subService', function (req, res) {
     //Just for testing:
     //console.log("Number of items in memory cache: ", memoryCache.size());
     //Just for testing:
-    //memoryCache.clear();
+    memoryCache.clear();
 
     //Url (inherited from Node's http module) is used as key, in order to support request with varying parameters. It includes all parameters and query strings:
     var cachedResponse = memoryCache.get(req.url);
@@ -62,17 +60,17 @@ app.get('/api/competitions/:seasonId/:subService', function (req, res) {
 
     request(options)
         .then((response) => {
-            //This works, but will be more meaningful when there cacheTimeout and longCacheTimeout have different values:
+            //This works, but will be more meaningful when cacheTimeout and longCacheTimeout have different values:
             if (subService === "leagueTable") {
                 currentMatchday = JSON.parse(response.body).matchday - 1;
-                console.log("subService is: " + subService + " and currentMatchday is : " + currentMatchday);
-                console.log("and req.url is ", req.url);
+                memoryCache.put(req.url, response.body, cacheTimeout);
+                //console.log("subService is: " + subService + ", currentMatchday is : " + currentMatchday + "and req.url is " + req.url);
             } else if ((subService === "fixtures" && req.query.matchday == currentMatchday) || (subService === "fixtures" && req.query.matchday === undefined)) {
                 console.log(req.query.matchday + " matches " + currentMatchday + " so short cacheTimeout being used");
                 memoryCache.put(req.url, response.body, cacheTimeout);
                 console.log("and req.url is ", req.url);
             } else {
-                console.log(req.query.matchday + " doesn't match current match day: " + currentMatchday + " so LONG cacheTimeout being used");
+                console.log(req.query.matchday + " doesn't match current match day: " + currentMatchday + " so long cacheTimeout being used");
                 memoryCache.put(req.url, response.body, longCacheTimeout);
                 console.log("and req.url is ", req.url);
             }
@@ -81,7 +79,7 @@ app.get('/api/competitions/:seasonId/:subService', function (req, res) {
             res.send(response.body);
         })
         .catch((error) => {
-            console.error(error);
+            console.log("Entered the catch of the request. Error: ", error);
             res.status(error.response.statusCode).send(error.response.body);
         });
 });
