@@ -284,7 +284,7 @@ $(document).ready(function () {
 
   //Generates the table for the match day results as well as for the adjusted matchday results. (Displays the same table twice, since the tables are predominantly the same, and hides the extra scores columns with css):
   function displayMatchdayResults(json, matchday) {
-    console.log("Called for matchday " + matchday);
+    console.log("Displaying match results for matchday " + matchday);
     var y = new Date(json.fixtures[0].date);
     var season = y.getFullYear();
     var year = y.getFullYear();
