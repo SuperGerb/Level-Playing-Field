@@ -70,9 +70,9 @@ $(document).ready(function () {
       //Set the global variable to the current match day:
       //I added -1 because there are often a lot of matches that haven't been played yet since we're in a different time zone. To do: make a better solution!!  
       currentMatchdayNumber = response.matchday;
-      //Display current match results:
+      //Display current match day results:
       getParticularMatchdayResults(currentMatchdayNumber);
-      console.log("Current matchday is = " + currentMatchdayNumber);
+      console.log("Current matchday = " + currentMatchdayNumber);
       displayCurrentLeagueTable(response, seasonYr);
       //Send the current match day to the web worker so it can start calculating the adjusted league table: 
       calculateAdjustedLeagueTable();
@@ -288,7 +288,7 @@ $(document).ready(function () {
     var y = new Date(json.fixtures[0].date);
     var season = y.getFullYear();
     var year = y.getFullYear();
-    var stats = '<table class="results-list table table-striped table-bordered table-sm">';
+    var stats = '<table class="results-list matchday-results-table table table-striped table-bordered table-sm">';
     stats += '<thead>';
     stats += '<tr>';
     stats += '<th>Date</th>';
