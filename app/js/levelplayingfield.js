@@ -304,38 +304,40 @@ $(document).ready(function () {
 
     //For each match in the fixtures table, fill in the 
     $.each(json.fixtures, function (index, value) {
-      var team1 = value.homeTeamName;
-      var team2 = value.awayTeamName;
-      var score1 = value.result.goalsHomeTeam;
-      var score2 = value.result.goalsAwayTeam;
-      var adjusted_scores = {};
-      var team1_salary = lookupTeamSalary(team1, year);
-      var team2_salary = lookupTeamSalary(team2, year);
-      var d = new Date(value.date);
-      var day = d.getDate();
-      var mon = d.getMonth();
-      var monthName = ["Jan", "Feb", "March", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
-      var month = monthName[mon];
-      var scoreIs = "";
+      if (value.status === "FINISHED") {
+        var team1 = value.homeTeamName;
+        var team2 = value.awayTeamName;
+        var score1 = value.result.goalsHomeTeam;
+        var score2 = value.result.goalsAwayTeam;
+        var adjusted_scores = {};
+        var team1_salary = lookupTeamSalary(team1, year);
+        var team2_salary = lookupTeamSalary(team2, year);
+        var d = new Date(value.date);
+        var day = d.getDate();
+        var mon = d.getMonth();
+        var monthName = ["Jan", "Feb", "March", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+        var month = monthName[mon];
+        var scoreIs = "";
 
-      adjusted_scores = adjustmentSchemes['adjustScores1'](team1_salary, score1, team2_salary, score2);
+        adjusted_scores = adjustmentSchemes['adjustScores1'](team1_salary, score1, team2_salary, score2);
 
-      if (adjusted_scores.score1 != score1 || adjusted_scores.score2 != score2) {
-        scoreIs = "different";
+        if (adjusted_scores.score1 != score1 || adjusted_scores.score2 != score2) {
+          scoreIs = "different";
+        }
+
+        stats += '<tr>';
+        stats += '<td>' + month + " " + day + '</td>';
+        stats += '<td>' + team1 + '</td>';
+        stats += '<td>' + team1_salary + '</td>';
+        stats += '<td class="score">' + score1 + '</td>';
+        stats += '<td class="score">' + score2 + '</td>';
+        stats += '<td class="adjusted-score ' + scoreIs + '">' + adjusted_scores.score1 + '</td>';
+        stats += '<td class="adjusted-score ' + scoreIs + '">' + adjusted_scores.score2 + '</td>';
+        stats += '<td>' + team2_salary + '</td>';
+        stats += '<td>' + team2 + '</td>';
+        stats += '</tr>';
+        stats += '</tbody>';
       }
-
-      stats += '<tr>';
-      stats += '<td>' + month + " " + day + '</td>';
-      stats += '<td>' + team1 + '</td>';
-      stats += '<td>' + team1_salary + '</td>';
-      stats += '<td class="score">' + score1 + '</td>';
-      stats += '<td class="score">' + score2 + '</td>';
-      stats += '<td class="adjusted-score ' + scoreIs + '">' + adjusted_scores.score1 + '</td>';
-      stats += '<td class="adjusted-score ' + scoreIs + '">' + adjusted_scores.score2 + '</td>';
-      stats += '<td>' + team2_salary + '</td>';
-      stats += '<td>' + team2 + '</td>';
-      stats += '</tr>';
-      stats += '</tbody>';
     });
 
     stats += '</table>';
