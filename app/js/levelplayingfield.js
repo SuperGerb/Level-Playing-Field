@@ -115,13 +115,12 @@ $(document).ready(function () {
   function getListOfTeams() {
     var seasonId = season.id;
     $.ajax({
-      headers: { 'X-Auth-Token': '7ff8904b117547748572064ac1e28265' },
       url: '/api/competitions/' + seasonId + '/teams',
       dataType: 'json',
       type: 'GET',
     }).done(function (response) {
       $.each(response.teams, function (index, value) {
-        //console.log(value.name);
+        console.log(value.name);
       })
     });
   }
@@ -272,7 +271,6 @@ $(document).ready(function () {
       stats += '<td>' + goalsAgainst + '</td>';
       stats += '<td>' + goalDifference + '</td>';
       stats += '<td>' + points + '</td>';
-      //To do: add a class if the results are different from the non-adjusted league table's results
       stats += '</tr>';
     });
 
@@ -302,7 +300,7 @@ $(document).ready(function () {
     stats += '</thead>';
     stats += '<tbody>';
 
-    //For each match in the fixtures table, fill in the 
+    //For each completed match in the fixtures table, fill in the results:
     $.each(json.fixtures, function (index, value) {
       if (value.status === "FINISHED") {
         var team1 = value.homeTeamName;

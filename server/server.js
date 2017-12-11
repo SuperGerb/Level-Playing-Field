@@ -12,7 +12,7 @@ const days = 86400000;
 const cacheTimeout = 60 * minutes;
 //I wanted to specify a much longer timeframe for past match day data, however it seemed to be rejected by the cache:
 //const longCacheTimeout = 30 * days;
-//To do: what is the maximum I can put this to?:
+//What is the maximum I can put this to? There's theoretically no limit. :
 const longCacheTimeout = 60 * minutes;
 
 var currentMatchday;

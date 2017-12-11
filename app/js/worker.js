@@ -193,8 +193,6 @@ function calculateMatchdayResults(json) {
   //console.log("pts= " + value.pts);
   // }
   //}	
-  // var workerResult = salaries;
-  // return workerResult;
 }
 
 function addTeamStatsToSalariesArray(year, team, matchday, win, draw, loss, goals_for, goals_against, goal_diff, pts) {
