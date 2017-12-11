@@ -25,7 +25,7 @@ onmessage = function (e) {
     const idx = i;
     requests.push(
       getParticularMatchdayResults(idx, seasonId).then(function (matchDayResults) {
-        calculateMatchdayResults(matchDayResults);
+        calculateMatchdayResults(matchDayResults, seasonYear);
         // console.log("The result of calculateMatchdayResults is: ", result);
         //console.log("i is :", idx);
         return idx;
@@ -115,11 +115,10 @@ var adjustmentSchemes = {
   }
 }
 
-function calculateMatchdayResults(json) {
+function calculateMatchdayResults(json, seasonYear) {
   var matchday = json.fixtures[0].matchday;
   console.log("Calculating, in worker, match " + matchday);
-  var y = new Date(json.fixtures[0].date);
-  var year = y.getFullYear();
+  var year = seasonYear;
   var fixtures = json.fixtures;
 
   for (var index in fixtures) {
