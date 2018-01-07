@@ -68,13 +68,13 @@ $(document).ready(function () {
       type: 'GET',
     }).done(function (response) {
       //Set the global variable to the current match day:
-      //I added -1 because there are often a lot of matches that haven't been played yet since we're in a different time zone. To do: make a better solution!!  
       currentMatchdayNumber = response.matchday;
-      //Display current match day results:
-      getParticularMatchdayResults(currentMatchdayNumber);
       console.log("Current matchday = " + currentMatchdayNumber);
+      // Get current match day results table, and adjusted results table:
+      getParticularMatchdayResults(currentMatchdayNumber);
+      // Get league table:
       displayCurrentLeagueTable(response, seasonYr);
-      //Send the current match day to the web worker so it can start calculating the adjusted league table: 
+      // Get adjusted league table:
       calculateAdjustedLeagueTable();
     });
   }
@@ -82,12 +82,13 @@ $(document).ready(function () {
   //To get the results of a particular match day: 
   function getParticularMatchdayResults(matchday) {
     var seasonId = season.id;
+    var seasonYr = season.year;
     $.ajax({
       url: '/api/competitions/' + seasonId + '/fixtures?matchday=' + matchday,
       dataType: 'json',
       type: 'GET',
     }).done(function (response) {
-      displayMatchdayResults(response, matchday);
+      displayMatchdayResults(response, matchday, seasonYr);
     });
   }
 
@@ -95,7 +96,7 @@ $(document).ready(function () {
     if (window.Worker) {
       //Creates a web worker to do the calculations for the league table in order to run the script in a background thread. The worker thread can perform tasks without interfering with the user interface.
       //Reference : https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
-      var calculateLeagueTableWorker = new Worker("js/worker.js?2");
+      var calculateLeagueTableWorker = new Worker("js/worker.js?3");
 
       //Message sent to worker with postMessage() method:
       calculateLeagueTableWorker.postMessage([currentMatchdayNumber, season, salaries]);
@@ -253,7 +254,7 @@ $(document).ready(function () {
 
     $.each(currentYearsAdjStats, function (index, value) {
       var team = value.team;
-      var matchesPlayed = currentMatchdayNumber;
+      var matchesPlayed = value.mp;
       var wins = value.w;
       var draws = value.d;
       var losses = value.l;
@@ -281,11 +282,10 @@ $(document).ready(function () {
   }
 
   //Generates the table for the match day results as well as for the adjusted matchday results. (Displays the same table twice, since the tables are predominantly the same, and hides the extra scores columns with css):
-  function displayMatchdayResults(json, matchday) {
-    console.log("Displaying match results for matchday " + matchday);
+  function displayMatchdayResults(json, matchday, year) {
     var y = new Date(json.fixtures[0].date);
     var season = y.getFullYear();
-    var year = y.getFullYear();
+    var completedMatches = 0;
     var stats = '<table class="results-list matchday-results-table table table-striped table-bordered table-sm">';
     stats += '<thead>';
     stats += '<tr>';
@@ -302,7 +302,8 @@ $(document).ready(function () {
 
     //For each completed match in the fixtures table, fill in the results:
     $.each(json.fixtures, function (index, value) {
-      if (value.status === "FINISHED") {
+      if (value.status == "FINISHED") {
+        completedMatches++;
         var team1 = value.homeTeamName;
         var team2 = value.awayTeamName;
         var score1 = value.result.goalsHomeTeam;
@@ -335,14 +336,19 @@ $(document).ready(function () {
         stats += '<td>' + team2 + '</td>';
         stats += '</tr>';
         stats += '</tbody>';
-      }
+      } 
     });
+
+    if(completedMatches == 0){
+      stats += '<p>No matches have been completed yet today.</p>';
+    }
 
     stats += '</table>';
     $('.year').html(season);
     $('.match').html(matchday);
     $('#results-match').html(stats);
     $('#adjusted-match-results').html(stats);
+    console.log("Displaying table and adjusted results for matchday " + matchday);
   }
 
   // function fillMatchSelectField(lastMatchPlayed){

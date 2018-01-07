@@ -34,7 +34,7 @@ onmessage = function (e) {
   }
 
   //When all promises are fulfilled, send the salaries array containting the salary-adjusted stats for each team, back to the main script so it can display the table:
-  Promise.all(requests).then(function (results) {  
+  Promise.all(requests).then(function (results) {
     postMessage(salaries);
   }).catch(function (error) {
     console.log("Error in promiseall :", error);
@@ -115,66 +115,67 @@ var adjustmentSchemes = {
   }
 }
 
-function calculateMatchdayResults(json, seasonYear) {
+function calculateMatchdayResults(json, year) {
   var matchday = json.fixtures[0].matchday;
-  console.log("Calculating, in worker, match " + matchday);
-  var year = seasonYear;
+  console.log("Calculating adjusted league table stats for match " + matchday);
   var fixtures = json.fixtures;
 
   for (var index in fixtures) {
     var value = fixtures[index];
-    var team1 = value.homeTeamName;
-    var team2 = value.awayTeamName;
-    var score1 = value.result.goalsHomeTeam;
-    var score2 = value.result.goalsAwayTeam;
-    //A blank object in which to store the adjusted scores, once calculated:
-    var adjusted_scores = {};
-    var team1_salary = lookupTeamSalary(team1, year);
-    var team2_salary = lookupTeamSalary(team2, year);
-    //Calculate the adjusted scores and save them to the adjusted_scores object:
-    adjusted_scores = adjustmentSchemes['adjustScores1'](team1_salary, score1, team2_salary, score2);
-    //Retrieve the adjusted scores:
-    var adjusted_score1 = adjusted_scores.score1;;
-    var adjusted_score2 = adjusted_scores.score2;
-    //Calculate the goal differential: 
-    var team1_goal_diff = adjusted_score1 - adjusted_score2;
-    var team2_goal_diff = adjusted_score2 - adjusted_score1;
-    //Calculate the other stats: 
-    var team1_win = 0;
-    var team1_draw = 0;
-    var team1_loss = 0;
-    var team1_pts = 0;
-    var team2_win = 0;
-    var team2_draw = 0;
-    var team2_loss = 0;
-    var team2_pts = 0;
+    if (value.status == "FINISHED") {
+      var team1 = value.homeTeamName;
+      var team2 = value.awayTeamName;
+      var score1 = value.result.goalsHomeTeam;
+      var score2 = value.result.goalsAwayTeam;
+      //A blank object in which to store the adjusted scores, once calculated:
+      var adjusted_scores = {};
+      var team1_salary = lookupTeamSalary(team1, year);
+      var team2_salary = lookupTeamSalary(team2, year);
+      //Calculate the adjusted scores and save them to the adjusted_scores object:
+      adjusted_scores = adjustmentSchemes['adjustScores1'](team1_salary, score1, team2_salary, score2);
+      //Retrieve the adjusted scores:
+      var adjusted_score1 = adjusted_scores.score1;;
+      var adjusted_score2 = adjusted_scores.score2;
+      //Calculate the goal differential: 
+      var team1_goal_diff = adjusted_score1 - adjusted_score2;
+      var team2_goal_diff = adjusted_score2 - adjusted_score1;
+      //Calculate the other stats: 
+      var team1_win = 0;
+      var team1_draw = 0;
+      var team1_loss = 0;
+      var team1_pts = 0;
+      var team2_win = 0;
+      var team2_draw = 0;
+      var team2_loss = 0;
+      var team2_pts = 0;
 
-    if (adjusted_score1 > adjusted_score2) {
-      team1_win = 1;
-      team2_loss = 1;
-      team1_pts = 3;
-    }
-    if (adjusted_score1 < adjusted_score2) {
-      team2_win = 1;
-      team1_loss = 1;
-      team2_pts = 3;
-    }
-    if (adjusted_score1 == adjusted_score2) {
-      team1_draw = 1;
-      team2_draw = 1;
-      team1_pts = 1;
-      team2_pts = 1;
-    }
-		/* Goal differential equation:
-		The number of goals scored in all league matches minus the number of goals conceded.
-		*/
-		/* Pts equation:
-		A win gives a team 3 points, a draw gives 1 point, a loss gives 0 points */
+      if (adjusted_score1 > adjusted_score2) {
+        team1_win = 1;
+        team2_loss = 1;
+        team1_pts = 3;
+      }
+      if (adjusted_score1 < adjusted_score2) {
+        team2_win = 1;
+        team1_loss = 1;
+        team2_pts = 3;
+      }
+      if (adjusted_score1 == adjusted_score2) {
+        team1_draw = 1;
+        team2_draw = 1;
+        team1_pts = 1;
+        team2_pts = 1;
+      }
+      /* Goal differential equation:
+      The number of goals scored in all league matches minus the number of goals conceded.
+      */
+      /* Pts equation:
+      A win gives a team 3 points, a draw gives 1 point, a loss gives 0 points */
 
-    //Store the stats for the team in the salaries array:
-    addTeamStatsToSalariesArray(year, team1, matchday, team1_win, team1_draw, team1_loss, adjusted_score1, adjusted_score2, team1_goal_diff, team1_pts);
+      //Store the stats for the team in the salaries array:
+      addTeamStatsToSalariesArray(year, team1, matchday, team1_win, team1_draw, team1_loss, adjusted_score1, adjusted_score2, team1_goal_diff, team1_pts);
 
-    addTeamStatsToSalariesArray(year, team2, matchday, team2_win, team2_draw, team2_loss, adjusted_score2, adjusted_score1, team2_goal_diff, team2_pts);
+      addTeamStatsToSalariesArray(year, team2, matchday, team2_win, team2_draw, team2_loss, adjusted_score2, adjusted_score1, team2_goal_diff, team2_pts);
+    }
   };
   //For testing:
   // var currentYearArray = salaries["2017"];
@@ -215,7 +216,9 @@ function addTeamStatsToSalariesArray(year, team, matchday, win, draw, loss, goal
             val.pts = 0;
           }
           //console.log("Stats now being updated for " + val.team + ".");
-          val.mp = matchday;
+          //matchday >= val.mp ? val.mp = matchday : val.mp;
+          //console.log("matchday: " + matchday + " and val.mp: " + val.mp + " for team: " + val.team);
+          val.mp++;
           val.w += win;
           val.d += draw;
           val.l += loss;
