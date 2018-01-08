@@ -3,4 +3,4 @@ Level Playing Field is a soccer statistics app that displays results from a para
 
 It applies a formula to Spanish soccer league results and displays the current and resulting tables.
 
-In order to use the API, a .config file would need to be created.
+View it online: http://www.lpffutbol.com/

@@ -81,9 +81,9 @@ function lookupTeamSalary(team, year) {
         if (value[i].team == team) {
           salary = value[i].salary;
         }
-      };
+      }    
     }
-  };
+  }
   return salary;
 }
 
@@ -134,7 +134,7 @@ function calculateMatchdayResults(json, year) {
       //Calculate the adjusted scores and save them to the adjusted_scores object:
       adjusted_scores = adjustmentSchemes['adjustScores1'](team1_salary, score1, team2_salary, score2);
       //Retrieve the adjusted scores:
-      var adjusted_score1 = adjusted_scores.score1;;
+      var adjusted_score1 = adjusted_scores.score1;
       var adjusted_score2 = adjusted_scores.score2;
       //Calculate the goal differential: 
       var team1_goal_diff = adjusted_score1 - adjusted_score2;
@@ -176,7 +176,7 @@ function calculateMatchdayResults(json, year) {
 
       addTeamStatsToSalariesArray(year, team2, matchday, team2_win, team2_draw, team2_loss, adjusted_score2, adjusted_score1, team2_goal_diff, team2_pts);
     }
-  };
+  }
   //For testing:
   // var currentYearArray = salaries["2017"];
   // for(var index in currentYearArray){
@@ -227,7 +227,7 @@ function addTeamStatsToSalariesArray(year, team, matchday, win, draw, loss, goal
           val.gd += goal_diff;
           val.pts += pts;
         }
-      };
+      }
     }
-  };
+  }
 }

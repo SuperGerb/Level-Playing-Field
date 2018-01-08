@@ -15,8 +15,12 @@ notes-documentation/
 config.js
 /*.env
 
+.eslintrc.js
+.eslintignore
+
 #################
 # Logs
+#################
 logs
 *.log
 npm-debug.log*
@@ -26,3 +30,5 @@ yarn-error.log*
 #################
 # Optional eslint cache
 .eslintcache
+
+
