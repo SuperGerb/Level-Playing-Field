@@ -15,8 +15,6 @@ notes-documentation/
 config.js
 /*.env
 
-.eslintrc.js
-.eslintignore
 
 #################
 # Logs
